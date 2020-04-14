@@ -1,0 +1,38 @@
+---
+- name: Create CA directories
+#  debug:
+#    msg: "{{item[0]}}/{{item[1]}}"
+  file:
+    path: "{{item[0]}}/{{item[1]}}"
+    state: directory
+    mode: 0750
+  tags: dirs
+  with_nested:
+    - "{{base_paths}}"
+    - "{{dirs}}"
+  vars:
+    base_paths:
+      - "{{ca_home}}/ca.{{ca.root.domain}}"
+      - "{{ca_home}}/ca.{{ca.root.domain}}/ca.hosts.{{ca.root.domain}}"
+      - "{{ca_home}}/ca.{{ca.root.domain}}/ca.services.{{ca.root.domain}}"
+      - "{{ca_home}}/ca.{{ca.root.domain}}/ca.users.{{ca.root.domain}}"
+    dirs: "{{ca.default.dirs}}"
+
+
+- name: Initialize CA database files
+  copy:
+    content: "{{ (item[1] == 'certs.db')|ternary('','1000\n') }}"
+    dest: "{{item[0]}}/{{item[1]}}"
+    force: no
+    mode: 0640
+  tags: dirs
+  with_nested:
+    - "{{base_paths}}"
+    - "{{db_files}}"
+  vars:
+    base_paths:
+      - "{{ca_home}}/ca.{{ca.root.domain}}/db"
+      - "{{ca_home}}/ca.{{ca.root.domain}}/ca.hosts.{{ca.root.domain}}/db"
+      - "{{ca_home}}/ca.{{ca.root.domain}}/ca.services.{{ca.root.domain}}/db"
+      - "{{ca_home}}/ca.{{ca.root.domain}}/ca.users.{{ca.root.domain}}/db"
+    db_files: "{{ca.default.db_files + ca.default.serial_files}}"

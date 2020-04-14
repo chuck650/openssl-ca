@@ -1,0 +1,20 @@
+[ v3_ext ]
+{% if certauth.key_usage is defined %}
+keyUsage                = critical,{{certauth.key_usage|join(',')}}
+{% endif %}
+{% if certauth.extended_key_usage is defined %}
+extendedkeyUsage        = critical,{{certauth.extended_key_usage|join(',')}}
+{% endif %}
+{% if certauth.constraints is defined %}
+basicConstraints        = critical,{{certauth.constraints|join(',')}}
+{% endif %}
+subjectKeyIdentifier    = hash
+subjectAltName          = @alt_names
+
+[ alt_names ]
+{% for name in certauth.subj.alt_names|default([certauth.name+'.'+ca.root.domain,'ca.'+certauth.name+'.'+ca.root.domain]) %}
+{% if loop.first and certauth == ca.root %}
+DNS.0 = {{ca.root.domain}}
+{% endif %}
+DNS.{{loop.index}} = {{name}}
+{% endfor %}

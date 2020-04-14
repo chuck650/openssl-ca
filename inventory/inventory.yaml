@@ -1,0 +1,9 @@
+all:
+  hosts:
+    localhost:
+      ansible_host: 127.0.0.1
+  children:
+    webservers:
+      hosts: {}
+    dbservers:
+      hosts: {}

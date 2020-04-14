@@ -1,0 +1,32 @@
+[ req ]
+distinguished_name      = req_dn         # DN section
+default_md              = sha384         # Message digest to use
+utf8only                = yes            # Input is UTF-8
+string_mask             = utf8only       # Emit UTF-8 strings
+req_extensions          = v3_ext         # CA Request extensions section
+prompt                  = no             # prompt for DN values
+
+[ req_dn ]
+{% if certauth.subj.C is defined or ca.root.subj.C is defined%}
+C   = {{certauth.subj.C|default(ca.root.subj.C)}}
+{% endif %}
+{% if certauth.subj.ST is defined or ca.root.subj.ST is defined %}
+ST  = {{certauth.subj.ST|default(ca.root.subj.ST)}}
+{% endif %}
+{% if certauth.subj.L is defined or ca.root.subj.L is defined %}
+L   = {{certauth.subj.L|default(ca.root.subj.L)}}
+{% endif %}
+{% if certauth.subj.O is defined or ca.root.subj.O is defined %}
+O   = {{certauth.subj.O|default(ca.root.subj.O)}}
+{% endif %}
+{% if certauth.subj.OU is defined or ca.root.subj.OU is defined %}
+OU  = {{certauth.subj.OU|default(ca.root.subj.OU)}}
+{% endif %}
+{% if certauth.subj.CN is defined %}
+CN  = {{certauth.subj.CN}}
+{% endif %}
+{% if certauth.subj.email is defined %}
+emailAddress  = {{certauth.subj.email}}
+{% endif %}
+
+{% include './templates/x509v3.conf.j2' %}

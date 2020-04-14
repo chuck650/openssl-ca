@@ -1,0 +1,18 @@
+---
+- name: Install/confirm openssl packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openssl
+    - perl-openssl
+    - python-openssl
+    - python3-openssl
+  become: yes
+
+- name: Install multipass snap
+  snap:
+    name: multipass
+    state: present
+    classic: yes
+  become: yes

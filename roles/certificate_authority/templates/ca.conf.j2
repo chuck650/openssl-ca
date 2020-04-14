@@ -1,0 +1,67 @@
+# OpenSSL CA configuration file
+# CA Certificate
+
+# Key Verification:
+# openssl ec -in {{base_path}}/private/{{fqdn}}.key -text -check
+
+[ default ]
+
+[ ca ]
+default_ca              = root_ca        # The default CA section
+
+[ root_ca ]
+# Directory and file locations.
+certificate       = {{base_path}}/certs/{{fqdn}}.crt    # The CA cert
+private_key       = {{base_path}}/private/{{fqdn}}.key  # The CA private key
+new_certs_dir     = {{base_path}}/certs
+serial            = {{base_path}}/db/certs.srl
+crlnumber         = {{base_path}}/db/certs-crl.srl
+database          = {{base_path}}/db/certs.db
+crl_dir           = {{base_path}}/crl
+crl               = {{base_path}}/crl/{{fqdn}}.crl.pem
+unique_subject    = no
+default_days      = 3652
+default_md        = sha384
+policy            = matching_pol
+email_in_dn       = no
+preserve          = no
+name_opt          = multiline,-esc_msb,utf8,lname,align   # Display UTF-8 characters
+#cert_opt          = ca_default
+copy_extensions   = copy
+#x509_extensions   = ca_ext
+crl_extensions    = crl_ext
+default_crl_days  = 30
+
+[ matching_pol ]
+# The root CA should only sign certificates that match.
+# See the POLICY FORMAT section of `man ca`.
+countryName             = match
+stateOrProvinceName     = supplied
+localityName            = supplied
+organizationName        = match
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ crl_ext ]
+authorityKeyIdentifier  = keyid:always
+authorityInfoAccess     = @issuer_info
+
+[ issuer_info ]
+caIssuers               = @aia
+OCSP                    = @ocsp
+
+[aia]
+{% for uri in online_info.aia %}
+URI.{{loop.index}} = "{{uri}}"
+{% endfor %}
+
+[ocsp]
+{% for uri in online_info.ocsp %}
+URI.{{loop.index}} = "{{uri}}"
+{% endfor %}
+
+[crl_info]
+{% for uri in online_info.crl %}
+URI.{{loop.index}} = "{{uri}}"
+{% endfor %}

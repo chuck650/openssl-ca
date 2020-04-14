@@ -1,0 +1,6 @@
+---
+- name: Debug vars
+  debug:
+    msg: "{{ca.certificates}}"
+  tags:
+    - certs

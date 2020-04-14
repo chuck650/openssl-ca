@@ -1,0 +1,112 @@
+ca:
+  default:
+    dirs:
+      - certs
+      - config
+      - crl
+      - csr
+      - db
+      - private
+    db_files:
+      - certs.db
+    serial_files:
+      - certs.srl
+      - crl.srl
+    days: 365
+    base_dir: CertAuth
+    subj:
+      C: US
+      ST: Tennessee
+      L: Knoxville
+      O: Cyber Defense
+      OU: Network Security
+    online_info:
+      ocsp_responder:
+        - http://ocsp.{{domain}}:9080
+      crl_server:
+        - http://pki.{{domain}}
+      aia_server:
+        - http://pki.{{domain}}
+  root: &root_ca
+    name: root
+    domain: "{{domain}}"
+    fqdn: "ca.{{domain}}"
+    subj:
+      CN: Root CA
+    key_usage:
+      - digitalSignature
+      - keyCertSign
+      - cRLSign
+    constraints:
+        - CA:TRUE
+        - pathlen:1
+  authorities:
+    - &root
+      name: root
+      domain: "{{domain}}"
+      fqdn: "ca.{{domain}}"
+      subj:
+        CN: Root CA
+      key_usage:
+        - digitalSignature
+        - keyCertSign
+        - cRLSign
+      constraints:
+          - CA:TRUE
+          - pathlen:1
+    - &hosts
+      name: hosts
+      parent: *root_ca
+      fqdn: "hosts.{{domain}}"
+      subj:
+        CN: Hosts CA
+      key_usage:
+        - digitalSignature
+        - keyCertSign
+        - cRLSign
+      constraints:
+        - CA:TRUE
+        - pathlen:0
+    - &services
+      name: services
+      parent: *root_ca
+      fqdn: "services.{{domain}}"
+      subj:
+        CN: Services CA
+      key_usage:
+        - digitalSignature
+        - keyCertSign
+        - cRLSign
+      constraints:
+        - CA:TRUE
+        - pathlen:0
+    - &users
+      name: users
+      parent: *root_ca
+      fqdn: "users.{{domain}}"
+      subj:
+        CN: Users CA
+      key_usage:
+        - digitalSignature
+        - keyCertSign
+        - cRLSign
+      constraints:
+        - CA:TRUE
+        - pathlen:0
+  certificates:
+    - name: www
+      fqdn: "www.{{domain}}"
+      subj:
+        CN: WWW Server
+      ca: *services
+      key_usage:
+        - digitalSignature
+        - keyEncipherment
+      extended_key_usage:
+        - serverAuthentication
+        - clientAuthentication
+      subj_alt_name:
+        - "{{domain}}"
+        - www.{{domain}}
+      constraints:
+        - CA:FALSE

@@ -1,0 +1,129 @@
+---
+- name: Setup certificate authority  for {{fqdn}}
+  block:
+
+#    - debug:
+#        msg: "{{base_path}}"
+#      tags:
+#        - sub_ca
+
+    - name: Create CA openssl config file
+      template:
+        src: ca.conf.j2
+        dest: "{{base_path}}/config/ca.conf"
+      tags:
+        - sub_ca
+
+    - name: Create CA x509v3 extensions config file
+      template:
+        src: x509v3.conf.j2
+        dest: "{{base_path}}/config/ca_x509v3.conf"
+      tags:
+        - sub_ca
+
+    - name: Create CA CSR config file
+      template:
+        src: csr.conf.j2
+        dest: "{{base_path}}/config/ca_csr.conf"
+      tags:
+        - sub_ca
+
+    - name: Create CA private key for {{fqdn}}
+      shell:
+        cmd: openssl ecparam -genkey -name secp384r1 | openssl ec -aes256 -passout pass:{{passphrase}} -out private/{{fqdn}}.key
+        chdir: "{{base_path}}/"
+        creates: "{{base_path}}/private/{{fqdn}}.key"
+      tags:
+        - sub_ca
+
+    - name: Check CA private key
+      command:
+        cmd: openssl ec -passin pass:{{passphrase}} -in private/{{fqdn}}.key -text -check
+        chdir: "{{base_path}}/"
+      changed_when: False
+      tags:
+        - sub_ca
+        - verify
+
+    - name: Create CA certificate signing request for {{fqdn}}
+      command:
+        argv:
+          - openssl
+          - req
+          - -new
+          - -batch
+          - -config
+          - config/ca_csr.conf
+          - -extensions
+          - v3_ext
+          - -passin
+          - pass:{{passphrase}}
+          - -key
+          - private/{{fqdn}}.key
+          - -out
+          - csr/{{fqdn}}.csr
+        chdir: "{{base_path}}/"
+        creates: "{{base_path}}/csr/{{fqdn}}.csr"
+      tags:
+        - sub_ca
+
+    - name: Verify CA certificate signing request
+      command:
+        cmd: openssl req -text -in csr/{{fqdn}}.csr -noout -verify
+        chdir: "{{base_path}}/"
+      register: cmd_result
+      failed_when: "'verify OK' not in cmd_result.stderr"
+      changed_when: False
+      tags:
+        - sub_ca
+        - verify
+
+    - name: Sign and Create CA certificate from CSR for {{fqdn}}
+      command:
+        argv:
+          - openssl
+          - ca
+          - -batch
+          - -create_serial
+          - -out
+          - "{{fqdn}}/certs/{{fqdn}}.crt"
+          - -days
+          - "{{certauth.days|default(ca.default.days)|default('365')}}"
+          - -passin
+          - pass:{{passphrase}}
+          - -keyfile
+          - private/{{parent_fqdn}}.key
+          - -config
+          - config/ca.conf
+          - -extfile
+          - "{{fqdn}}/config/ca_x509v3.conf"
+          - -extensions
+          - v3_ext
+          - -infiles
+          - "{{fqdn}}/csr/{{fqdn}}.csr"
+        chdir: "{{base_path}}/../"
+        creates: "{{base_path}}/{{fqdn}}/certs/{{fqdn}}.crt"
+      tags:
+        - sub_ca
+
+    - name: Verify CA certificate
+      command:
+        cmd: openssl x509 -noout -in certs/{{fqdn}}.crt
+        chdir: "{{base_path}}"
+      changed_when: False
+      tags:
+        - sub_ca
+        - verify
+
+  vars:
+    fqdn: "ca.{{certauth.name}}.{{ca.root.domain}}"
+    base_path: "{{ca_home}}/ca.{{ca.root.domain}}/ca.{{certauth.name}}.{{ca.root.domain}}"
+    online_info:
+      ocsp:
+        - "{{ca.default.online_info.ocsp_responder}}"
+      crl:
+        - "{{ca.default.online_info.crl_server}}/ca.{{certauth.name}}.{{ca.root.domain}}.crl"
+      aia:
+        - "{{ca.default.online_info.crl_server}}/ca.{{certauth.name}}.{{ca.root.domain}}.crt"
+  tags:
+    - sub_ca

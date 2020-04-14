@@ -1,0 +1,203 @@
+---
+ca_paths:
+  - name: RootCA
+    path: ca.chuck.lab
+    state: directory
+    mode: 0640
+  - name: certs
+    path: ca.chuck.lab/certs
+    state: directory
+    mode: 0640
+  - name: config
+    path: ca.chuck.lab/config
+    state: directory
+    mode: 0640
+  - name: crl
+    path: ca.chuck.lab/crl
+    state: directory
+    mode: 0640
+  - name: csr
+    path: ca.chuck.lab/csr
+    state: directory
+    mode: 0640
+  - name: db
+    path: ca.chuck.lab/db
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/db/certs.db
+    mode: 0640
+  - name: certs.srl
+    path: ca.chuck.lab/db/certs.srl
+    content: 1000
+    mode: 0640
+  - name: crl.srl
+    path: ca.chuck.lab/db/crl.srl
+    content: 1000
+    mode: 0640
+  - name: private
+    path: ca.chuck.lab/private
+    state: directory
+    mode: 0640
+  - name: SubCA
+    path: hosts.chuck.lab
+    state: directory
+    mode: 0640
+  - name: certs
+    path: ca.chuck.lab/hosts.chuck.lab/certs
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/hosts.chuck.lab/db/certs.db
+    mode: 0640
+  - name: config
+    path: ca.chuck.lab/hosts.chuck.lab/config
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/hosts.chuck.lab/db/certs.db
+    mode: 0640
+  - name: crl
+    path: ca.chuck.lab/hosts.chuck.lab/crl
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/hosts.chuck.lab/db/certs.db
+    mode: 0640
+  - name: csr
+    path: ca.chuck.lab/hosts.chuck.lab/csr
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/hosts.chuck.lab/db/certs.db
+    mode: 0640
+  - name: db
+    path: ca.chuck.lab/hosts.chuck.lab/db
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/hosts.chuck.lab/db/certs.db
+    mode: 0640
+  - name: certs.srl
+    path: ca.chuck.lab/hosts.chuck.lab/db/certs.srl
+    content: 1000
+    mode: 0640
+  - name: crl.srl
+    path: ca.chuck.lab/hosts.chuck.lab/db/crl.srl
+    content: 1000
+    mode: 0640
+  - name: private
+    path: ca.chuck.lab/hosts.chuck.lab/private
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/hosts.chuck.lab/db/certs.db
+    mode: 0640
+  - name: SubCA
+    path: services.chuck.lab
+    state: directory
+    mode: 0640
+  - name: certs
+    path: ca.chuck.lab/services.chuck.lab/certs
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/services.chuck.lab/db/certs.db
+    mode: 0640
+  - name: config
+    path: ca.chuck.lab/services.chuck.lab/config
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/services.chuck.lab/db/certs.db
+    mode: 0640
+  - name: crl
+    path: ca.chuck.lab/services.chuck.lab/crl
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/services.chuck.lab/db/certs.db
+    mode: 0640
+  - name: csr
+    path: ca.chuck.lab/services.chuck.lab/csr
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/services.chuck.lab/db/certs.db
+    mode: 0640
+  - name: db
+    path: ca.chuck.lab/services.chuck.lab/db
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/services.chuck.lab/db/certs.db
+    mode: 0640
+  - name: certs.srl
+    path: ca.chuck.lab/services.chuck.lab/db/certs.srl
+    content: 1000
+    mode: 0640
+  - name: crl.srl
+    path: ca.chuck.lab/services.chuck.lab/db/crl.srl
+    content: 1000
+    mode: 0640
+  - name: private
+    path: ca.chuck.lab/services.chuck.lab/private
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/services.chuck.lab/db/certs.db
+    mode: 0640
+  - name: SubCA
+    path: users.chuck.lab
+    state: directory
+    mode: 0640
+  - name: certs
+    path: ca.chuck.lab/users.chuck.lab/certs
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/users.chuck.lab/db/certs.db
+    mode: 0640
+  - name: config
+    path: ca.chuck.lab/users.chuck.lab/config
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/users.chuck.lab/db/certs.db
+    mode: 0640
+  - name: crl
+    path: ca.chuck.lab/users.chuck.lab/crl
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/users.chuck.lab/db/certs.db
+    mode: 0640
+  - name: csr
+    path: ca.chuck.lab/users.chuck.lab/csr
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/users.chuck.lab/db/certs.db
+    mode: 0640
+  - name: db
+    path: ca.chuck.lab/users.chuck.lab/db
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/users.chuck.lab/db/certs.db
+    mode: 0640
+  - name: certs.srl
+    path: ca.chuck.lab/users.chuck.lab/db/certs.srl
+    content: 1000
+    mode: 0640
+  - name: crl.srl
+    path: ca.chuck.lab/users.chuck.lab/db/crl.srl
+    content: 1000
+    mode: 0640
+  - name: private
+    path: ca.chuck.lab/users.chuck.lab/private
+    state: directory
+    mode: 0640
+  - name: certs.db
+    path: ca.chuck.lab/users.chuck.lab/db/certs.db
+    mode: 0640

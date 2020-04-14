@@ -1,0 +1,49 @@
+---
+- name: Set Certificate Authority home directory
+  set_fact:
+    ca_home: "{{ansible_user_dir}}/openssl/{{ca.default.base_dir}}"
+  tags: always
+
+- name: Show install path
+  debug:
+    msg: "CA Home: {{ca_home}}"
+  tags: always
+
+- name: Include directory tree tasks
+  import_tasks: make_directory_tree.yaml
+  tags:
+    - dirs
+
+- name: Include root certificate authority tasks
+  import_tasks: make_root_certificate_authority.yaml
+  vars:
+    certauth: "{{ca.root}}"
+    fqdn: "ca.{{ca.root.domain}}"
+    base_path: "{{ca_home}}/ca.{{ca.root.domain}}"
+    online_info:
+      ocsp:
+        - "{{ca.default.online_info.ocsp_responder}}"
+      crl:
+        - "{{ca.default.online_info.crl_server}}/{{ca.root.domain}}.crl"
+      aia:
+        - "{{ca.default.online_info.crl_server}}/{{ca.root.domain}}.crt"
+  tags:
+    - root_ca
+    - verify
+
+- name: Include certificate authority tasks
+  include_tasks: make_sub_certificate_authorities.yaml
+  loop: "{{ca.authorities}}"
+  loop_control:
+    loop_var: certauth
+  vars:
+    parent_fqdn: "ca.{{ca.root.domain}}"
+  tags:
+    - sub_ca
+    - verify
+
+- name: Include certificate tasks
+  include_tasks: make_certificates.yaml
+  tags:
+    - certs
+    - verify
