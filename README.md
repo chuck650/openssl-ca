@@ -1,4 +1,4 @@
-# Task based reference guide
+# openssl-ca: An OpenSSL based Certificate Authority for private networks
 
 ## Check what hosts are affected by a playbook
 
