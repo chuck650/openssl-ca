@@ -11,10 +11,10 @@
     default: "passphrase"
   - name: domain
     prompt: "Enter the Certificate Authority domain name.\n"
-    default: "{{hostvars.localhost.ansible_user_id.split('@')[0]}}.lab"
+    default: "{{ hostvars.localhost.ansible_user_id.split('@')[0] }}.lab"
   roles:
     - common
-#    - certificate_authority
+    - certificate_authority
 #  tasks:
 #    - name: Show facts
 #      debug:
