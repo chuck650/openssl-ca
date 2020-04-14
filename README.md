@@ -6,6 +6,12 @@ The project leverages Ansible as a DevOps tool to generate openssh config files 
 
 ## Suggested installation procedure.
 
+There are a couple of dependencies for running the project.
+
+```bash
+$ sudo apt install ansible python3-distutils
+```
+
 Create a directory for `ansible` projects then clone this repository into the `ansible` directory.
 
 

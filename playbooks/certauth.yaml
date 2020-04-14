@@ -1,21 +1,6 @@
 ---
 - hosts: localhost
   connection: local
-
-- hosts: localhost
-  connection: local
   gather_facts: no
-  vars_prompt:
-  - name: passphrase
-    prompt: "Enter passphrase for secret keys.\n"
-    default: "passphrase"
-  - name: domain
-    prompt: "Enter the Certificate Authority domain name.\n"
-    default: "{{ hostvars.localhost.ansible_user_id.split('@')[0] }}.lab"
   roles:
-    - common
     - certificate_authority
-#  tasks:
-#    - name: Show facts
-#      debug:
-#        msg: "{{domain}}"

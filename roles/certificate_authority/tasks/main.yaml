@@ -1,4 +1,32 @@
 ---
+- name: Get system info
+  setup:
+    gather_subset:
+      - '!all'
+
+- block:
+
+  - name: Enter passphrase for secret keys [{{ default_passphrase }}]
+    pause:
+      prompt: "Enter passphrase"
+      echo: no
+    register: passphrase
+
+  - name: Enter the Certificate Authority domain name [{{ default_domain }}]
+    pause:
+      prompt: "Enter domain name"
+    register: domain
+
+  - name: Set facts
+    set_fact:
+      passphrase: "{{(passphrase.user_input != '')|ternary(passphrase.user_input,default_passphrase)}}"
+      domain: "{{(domain.user_input != '')|ternary(domain.user_input,default_domain)}}"
+      cacheable: yes
+
+  vars:
+    default_passphrase: passphrase
+    default_domain: "{{ hostvars.localhost.ansible_user_id.split('@')[0] }}.lab"
+
 - name: Set Certificate Authority home directory
   set_fact:
     ca_home: "{{ansible_user_dir}}/openssl/{{ca.default.base_dir}}"
@@ -44,6 +72,8 @@
 
 - name: Include certificate tasks
   include_tasks: make_certificates.yaml
+  when:
+    - ca.certificates is defined
   tags:
     - certs
     - verify

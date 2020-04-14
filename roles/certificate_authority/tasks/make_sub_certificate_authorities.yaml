@@ -102,7 +102,7 @@
           - -infiles
           - "{{fqdn}}/csr/{{fqdn}}.csr"
         chdir: "{{base_path}}/../"
-        creates: "{{base_path}}/{{fqdn}}/certs/{{fqdn}}.crt"
+        creates: "{{base_path}}/../{{fqdn}}/certs/{{fqdn}}.crt"
       tags:
         - sub_ca
 

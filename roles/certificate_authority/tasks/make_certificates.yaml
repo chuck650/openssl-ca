@@ -2,5 +2,6 @@
 - name: Debug vars
   debug:
     msg: "{{ca.certificates}}"
+    verbosity: 2
   tags:
     - certs
