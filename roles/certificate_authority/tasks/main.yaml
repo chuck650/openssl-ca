@@ -35,6 +35,7 @@
 - name: Show install path
   debug:
     msg: "CA Home: {{ca_home}}"
+    verbosity: 1
   tags: always
 
 - name: Include directory tree tasks
@@ -42,8 +43,14 @@
   tags:
     - dirs
 
+- name: Check RootCA certificate
+  stat:
+    path: "{{ca_home}}/ca.{{ca.root.domain}}/certs/ca.{{ca.root.domain}}.crt"
+  register: root_cert
+
 - name: Include root certificate authority tasks
   import_tasks: make_root_certificate_authority.yaml
+  when: not root_cert.stat.exists
   vars:
     certauth: "{{ca.root}}"
     fqdn: "ca.{{ca.root.domain}}"
@@ -70,10 +77,10 @@
     - sub_ca
     - verify
 
-- name: Include certificate tasks
-  include_tasks: make_certificates.yaml
-  when:
-    - ca.certificates is defined
-  tags:
-    - certs
-    - verify
+#- name: Include certificate tasks
+#  include_tasks: make_certificates.yaml
+#  when:
+#    - ca.certificates is defined
+#  tags:
+#    - certs
+#    - verify

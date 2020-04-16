@@ -1,0 +1,78 @@
+---
+- name: Get system info
+  setup:
+    gather_subset:
+      - '!all'
+
+#- name: Set Certificate Authority home directory
+#  set_fact:
+#    ca_home: "{{ansible_user_dir}}/openssl/{{ca.default.base_dir}}"
+#  tags: always
+
+- block:
+
+  - name: "Enter service name: e.g.  http, smtp, db"
+    pause:
+      prompt: "Enter service name"
+    register: service_name
+
+  - name: "Enter service point FQDN: e.g.  example.com,www.example.com"
+    pause:
+      prompt: "Enter FQDN"
+    register: fqdn
+
+  - name: Set certificate properties
+    set_fact:
+      cert:
+        type: service
+        domain: "{{hostname|regex_replace('^[\\w\\.]*\\b(\\w+\\.\\w+)$','\\1')}}"
+        name: "{{hostname|regex_replace('^([\\w\\.]+)\\.\\w+\\.\\w+$','\\1')}}"
+        service: "{{service_name.user_input}}"
+        fqdn: "{{fqdn.user_input}}"
+        subj:
+          CN: "{{service_name.user_input|upper}} Server"
+        key_usage:
+          - digitalSignature
+          - keyEncipherment
+        extended_key_usage:
+          - serverAuthentication
+          - clientAuthentication
+        subj_alt_name: "{{fqdn.user_input.split(',')|list}}"
+        constraints:
+          - CA:FALSE
+    vars:
+      hostname: "{{fqdn.user_input.split(',')[0]}}"
+
+
+  - name: Display Certificate
+    debug:
+      var: cert
+      verbosity: 1
+#    failed_when: service_name.user_input == ""
+
+  - name: "Review requested certificate properties"
+    pause:
+      prompt: "Enter to continue, Ctrl-c to abort?"
+    register: continue
+    failed_when: continue.user_input == "x"
+
+  - name: Show templated config
+    debug:
+      msg: "{{lookup('template','service-csr.conf.j2')}}"
+
+  - name: Generate CSR config file
+    template:
+      src: service-csr.conf.j2
+      dest: "{{base_path}}/ca.services.{{domain}}/config/{{cert.fqdn.split(',')[0]}}_csr.conf"
+
+  vars:
+    passphrase: passphrase
+    domain: "{{ hostvars.localhost.ansible_user_id.split('@')[0] }}.lab"
+    base_path: "{{ansible_user_dir}}/openssl/{{ca.default.base_dir}}/ca.{{ca.root.domain}}"
+#    online_info:
+#      ocsp:
+#        - "{{ca.default.online_info.ocsp_responder}}"
+#      crl:
+#        - "{{ca.default.online_info.crl_server}}/{{ca.root.domain}}.crl"
+#      aia:
+#        - "{{ca.default.online_info.crl_server}}/{{ca.root.domain}}.crt"

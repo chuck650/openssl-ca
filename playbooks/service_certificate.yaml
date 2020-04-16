@@ -1,0 +1,10 @@
+---
+  - hosts: localhost
+    connection: local
+    gather_facts: no
+    tasks:
+      - name: Generating service certificate
+        include_role:
+          name: certificate_authority
+          public: yes
+          tasks_from: make_service_certificate

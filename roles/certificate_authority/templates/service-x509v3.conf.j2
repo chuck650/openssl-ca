@@ -1,0 +1,17 @@
+[ v3_ext ]
+{% if cert.key_usage is defined %}
+keyUsage                = critical,{{cert.key_usage|join(',')}}
+{% endif %}
+{% if cert.extended_key_usage is defined %}
+extendedkeyUsage        = critical,{{cert.extended_key_usage|join(',')}}
+{% endif %}
+{% if cert.constraints is defined %}
+basicConstraints        = critical,{{cert.constraints|join(',')}}
+{% endif %}
+subjectKeyIdentifier    = hash
+subjectAltName          = @alt_names
+
+[ alt_names ]
+{% for name in cert.subj.alt_names|default([cert.name+'.'+ca.root.domain]) %}
+DNS.{{loop.index0}} = {{name}}
+{% endfor %}

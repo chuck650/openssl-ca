@@ -1,0 +1,32 @@
+[ req ]
+distinguished_name      = req_dn         # DN section
+default_md              = sha384         # Message digest to use
+utf8only                = yes            # Input is UTF-8
+string_mask             = utf8only       # Emit UTF-8 strings
+req_extensions          = v3_ext         # CA Request extensions section
+prompt                  = no             # prompt for DN values
+
+[ req_dn ]
+{% if cert.subj.C is defined or ca.root.subj.C is defined or ca.default.subj.C is defined %}
+C   = {{cert.subj.C|default(ca.root.subj.C)|default(ca.default.subj.C)}}
+{% endif %}
+{% if cert.subj.ST is defined or ca.root.subj.ST is defined or ca.default.subj.ST is defined %}
+ST  = {{cert.subj.ST|default(ca.root.subj.ST)|default(ca.default.subj.ST)}}
+{% endif %}
+{% if cert.subj.L is defined or ca.root.subj.L is defined or ca.default.subj.L is defined %}
+L   = {{cert.subj.L|default(ca.root.subj.L)|default(ca.default.subj.L)}}
+{% endif %}
+{% if cert.subj.O is defined or ca.root.subj.O is defined or ca.default.subj.O is defined %}
+O   = {{cert.subj.O|default(ca.root.subj.O)|default(ca.default.subj.O)}}
+{% endif %}
+{% if cert.subj.OU is defined or ca.root.subj.OU is defined or ca.default.subj.OU is defined %}
+OU  = {{cert.subj.OU|default(ca.root.subj.OU|default(ca.default.subj.OU))}}
+{% endif %}
+{% if cert.subj.CN is defined %}
+CN  = {{cert.subj.CN}}
+{% endif %}
+{% if cert.subj.email is defined %}
+emailAddress  = {{cert.subj.email}}
+{% endif %}
+
+{% include './templates/service-x509v3.conf.j2' %}
