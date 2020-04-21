@@ -45,3 +45,51 @@ The path for the create CA hierarchy files is `~/openssl/CertAuth/ca.${USER}.lab
 ```bash
 $ ansible-playbook playbooks/certauth.yaml
 ```
+
+## Create a service certificate
+
+### Automated using Ansible
+From the openssl-ca project folder...
+
+```bash
+$ ansible-playbook playbooks/service_certificate.yaml
+
+```
+
+### Manually using OpenSSL
+
+#### Generate a certificate private elliptic curve key
+
+```bash
+openssl ecparam -genkey -name secp384r1 | openssl ec -aes256 -out private/www.example.com.key
+```
+
+#### Verify a certificate private key
+
+```bash
+$ openssl ec -in private/service.key.pem -text -check
+```
+
+#### Generate a certificate signing request (CSR)
+
+```bash
+openssl req -new -batch -config config/www.example.com_csr.conf -key private/www.example.com.key -out csr/www.example.com.csr
+```
+
+#### Verify a certificate signing request (CSR)
+
+```bash
+openssl req -text -in csr/www.example.com.csr -noout -verify
+```
+
+#### Generate a certificate from a CSR
+
+```bash
+openssl ca -batch -create_serial -out certs/www.example.com.crt -days 365 -keyfile private/ca.services.chuck.lab.key -config config/ca.conf -infiles csr/www.example.com.csr
+```
+
+#### Verify a certificate
+
+```bash
+openssl x509 -noout -text -in certs/www.example.com.crt
+```
