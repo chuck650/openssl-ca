@@ -30,13 +30,13 @@
         service: "{{service_name.user_input}}"
         fqdn: "{{fqdn.user_input}}"
         subj:
-          CN: "{{service_name.user_input|upper}} Server"
+          CN: "{{service_name.user_input|upper}}/{{fqdn.user_input.split(',')[0]|lower}}"
         key_usage:
           - digitalSignature
           - keyEncipherment
         extended_key_usage:
-          - serverAuthentication
-          - clientAuthentication
+          - serverAuth
+          - clientAuth
         subj_alt_name: "{{fqdn.user_input.split(',')|list}}"
         constraints:
           - CA:FALSE
@@ -44,10 +44,10 @@
       hostname: "{{fqdn.user_input.split(',')[0]}}"
 
 
-  - name: Display Certificate
+  - name: Display certificate input data
     debug:
       var: cert
-      verbosity: 1
+      verbosity: 0
 #    failed_when: service_name.user_input == ""
 
   - name: "Review requested certificate properties"
@@ -64,6 +64,72 @@
     template:
       src: service-csr.conf.j2
       dest: "{{base_path}}/ca.services.{{domain}}/config/{{cert.fqdn.split(',')[0]}}_csr.conf"
+
+  - name: Create private key for {{ cert.fqdn.split(',')[0] }}
+    shell:
+      cmd: openssl ecparam -genkey -name secp384r1 | openssl ec -aes256 -passout pass:{{passphrase}} -out private/{{cert.fqdn.split(',')[0]}}.key
+      chdir: "{{base_path}}/ca.services.{{domain}}/"
+      creates: "{{base_path}}/ca.services.{{domain}}/private/{{cert.fqdn.split(',')[0]}}.key"
+
+  - name: Check CA private key
+    command:
+      cmd: openssl ec -passin pass:{{passphrase}} -in private/{{cert.fqdn.split(',')[0]}}.key -text -check
+      chdir: "{{base_path}}/ca.services.{{domain}}/"
+    changed_when: False
+
+  - name: Create certificate signing request for {{cert.fqdn.split(',')[0]}}
+    command:
+      argv:
+        - openssl
+        - req
+        - -new
+        - -batch
+        - -config
+        - config/{{cert.fqdn.split(',')[0]}}_csr.conf
+        - -passin
+        - pass:{{passphrase}}
+        - -key
+        - private/{{cert.fqdn.split(',')[0]}}.key
+        - -out
+        - csr/{{cert.fqdn.split(',')[0]}}.csr
+      chdir: "{{base_path}}/ca.services.{{domain}}/"
+      creates: "{{base_path}}/ca.services.{{domain}}/csr/{{cert.fqdn.split(',')[0]}}.csr"
+
+  - name: Verify certificate signing request
+    command:
+      cmd: openssl req -text -in csr/{{cert.fqdn.split(',')[0]}}.csr -noout -verify
+      chdir: "{{base_path}}/ca.services.{{domain}}/"
+    register: cmd_result
+    failed_when: "'verify OK' not in cmd_result.stderr"
+    changed_when: False
+
+  - name: Sign and Create certificate from CSR for {{cert.fqdn.split(',')[0]}}
+    command:
+      argv:
+        - openssl
+        - ca
+        - -batch
+        - -create_serial
+        - -out
+        - "certs/{{cert.fqdn.split(',')[0]}}.crt"
+        - -days
+        - "{{certauth.days|default(ca.default.days)|default('365')}}"
+        - -passin
+        - pass:{{passphrase}}
+        - -keyfile
+        - private/ca.services.{{domain}}.key
+        - -config
+        - config/ca.conf
+        - -infiles
+        - "csr/{{cert.fqdn.split(',')[0]}}.csr"
+      chdir: "{{base_path}}/ca.services.{{domain}}/"
+      creates: "{{base_path}}/ca.services.{{domain}}/certs/{{cert.fqdn.split(',')[0]}}.crt"
+
+  - name: Verify CA certificate
+    command:
+      cmd: openssl x509 -noout -in certs/{{cert.fqdn.split(',')[0]}}.crt
+      chdir: "{{base_path}}/ca.services.{{domain}}/"
+    changed_when: False
 
   vars:
     passphrase: passphrase

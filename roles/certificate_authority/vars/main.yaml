@@ -90,8 +90,8 @@ ca:
         - digitalSignature
         - keyEncipherment
       extended_key_usage:
-        - serverAuthentication
-        - clientAuthentication
+        - serverAuth
+        - clientAuth
       subj_alt_name:
         - "{{domain}}"
         - www.{{domain}}

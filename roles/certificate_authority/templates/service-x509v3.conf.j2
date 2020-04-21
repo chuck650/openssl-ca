@@ -3,7 +3,7 @@
 keyUsage                = critical,{{cert.key_usage|join(',')}}
 {% endif %}
 {% if cert.extended_key_usage is defined %}
-extendedkeyUsage        = critical,{{cert.extended_key_usage|join(',')}}
+extendedKeyUsage        = critical,{{cert.extended_key_usage|join(',')}}
 {% endif %}
 {% if cert.constraints is defined %}
 basicConstraints        = critical,{{cert.constraints|join(',')}}
