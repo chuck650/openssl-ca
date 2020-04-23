@@ -53,8 +53,8 @@
   - name: "Review requested certificate properties"
     pause:
       prompt: "Enter to continue, Ctrl-c to abort?"
-    register: continue
-    failed_when: continue.user_input == "x"
+    register: KeepGoing
+    failed_when: KeepGoing.user_input == "x"
 
   - name: Show templated config
     debug:
